@@ -1,0 +1,17 @@
+.mainsign{ color: #9999bb;
+    line-height: 300%; 
+    text-align:center ; }
+header { 
+    background: #dddddd;
+    line-height: 300%; }
+body {
+	background: #eeeeee; 
+	}
+.leftside { 
+	background: #dddddd;
+	padding: 20px;
+	}
+.center {
+	background: #dddddd;
+	padding: 20px;
+	}
