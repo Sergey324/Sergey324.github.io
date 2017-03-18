@@ -80,6 +80,12 @@ function div(x, y) {
 	return(Math.floor(x / y));
 }
 
+function lifeTick(i) {
+	bugs[i].moveX(getRandomInt(-5, 5));
+	bugs[i].moveY(getRandomInt(-5, 5));
+	
+}
+
 
 //---------------------------------------------------------------------------------------------------------------------------
 
@@ -88,6 +94,11 @@ function div(x, y) {
 window.addEventListener('keydown',this.checkDown,false);
 window.addEventListener('keyup',this.checkUp,false);
 
+
+//---------------------------------------------------------------------------------------------------------------------------
+
+
+//Клавиатура
 function checkDown(e) {
   key = e.keyCode;
 	switch(key){
@@ -124,6 +135,19 @@ function checkUp(e) {
 	}
 }
 
+if(keyPressed[1] == 1) {
+	bugger.moveUp();
+}
+if(keyPressed[2] == 1) {
+	bugger.moveLeft();
+}
+if(keyPressed[3] == 1) {
+	bugger.moveDown();
+}
+if(keyPressed[4] == 1) {
+	bugger.moveRight();
+}
+	
 
 //---------------------------------------------------------------------------------------------------------------------------
 
@@ -177,9 +201,7 @@ class bug {
 		}
 	}
 	
-	lifeTick() {
-		
-	}
+
 	
 }
 
@@ -230,25 +252,11 @@ function tick() {
 
 	
 	//Персонаж
-	if(keyPressed[1] == 1) {
-		bugger.moveUp();
-	}
-	if(keyPressed[2] == 1) {
-		bugger.moveLeft();
-	}
-	if(keyPressed[3] == 1) {
-		bugger.moveDown();
-	}
-	if(keyPressed[4] == 1) {
-		bugger.moveRight();
-	}
-	
+
 	ctx.fillRect(bugger.xPos - 2, bugger.yPos - 2, 5, 5);
 	for (var i = 0; i < bugNumber; i++) {
-			bugs[i].moveX(getRandomInt(-3, 3));
-			bugs[i].moveY(getRandomInt(-3, 3));
-			bugs[i].lifeTick();
-			ctx.fillRect(bugs[i].xPos - 2, bugs[i].yPos - 2, 5, 5);
+		lifeTick(i);
+		ctx.fillRect(bugs[i].xPos - 2, bugs[i].yPos - 2, 5, 5);
 	}
 }
 
