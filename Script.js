@@ -52,10 +52,9 @@ var picRock = new Image();
 
 //Переменные
 var bugNumber = 0;
+var foodNumber = 0;
 var keyPressed = [0, 0, 0, 0, 0]; //w, a, s, d
 var key;
-var xPos = 40;
-var yPos = 40;
 
 //Функции	
 function getRandomInt(min, max) {
@@ -64,6 +63,7 @@ function getRandomInt(min, max) {
 function div(x, y) {
 	return(Math.floor(x / y));
 }
+
 
 //События
 window.addEventListener('keydown',this.checkDown,false);
@@ -107,32 +107,54 @@ function checkUp(e) {
 
 //Массив объектов
 var bugs = [];
+var foodCells = [];
 
 //Класс
 class bug {
-	sayAlert(x) {
-		alert(x);
-	}	
+	constructor() {
+		this.xPos = 40;
+		this.yPos = 40;
+	}
+	moveUp() {
+		if (board[div(this.xPos, cellSize)][div(this.yPos - 3, cellSize)] == 0) {
+			this.yPos = this.yPos - 3;
+		}
+	}
+	moveDown() {
+		if (board[div(this.xPos, cellSize)][div(this.yPos + 3, cellSize)] == 0) {
+			this.yPos = this.yPos + 3;
+		}
+	}
+	moveLeft() {
+		if (board[div(this.xPos - 3, cellSize)][div(this.yPos, cellSize)] == 0) {
+			this.xPos = this.xPos - 3;
+		}
+	}
+	moveRight() {
+		if (board[div(this.xPos + 3, cellSize)][div(this.yPos, cellSize)] == 0) {
+			this.xPos = this.xPos + 3;
+		}
+	}
 }
 
-function moveUp(y) {
-	return(y - 3);
-}
-function moveDown(y) {
-	return(y + 3);
-}
-function moveLeft(x) {
-	return(x - 3);
-}
-function moveRight(x) {
-	return(x + 3);
+class foodCell {
+	constructor(x, y) {
+		this.xCell = div(x, 32);
+		this.yCell = div(y, 32);
+	}
+	
 }
 
-for (var k = 0; k < 10; k++){
-	bugs.push(0);
-	bugs[bugNumber] = new bug(0, 0);
-	bugNumber++;
+function tester(a, b) {
+	var FoodCell = new foodCell(a, b)
+	FoodCell.foodCellPosition();
+	console.log(screen.offsetTop)
 }
+
+
+bugs.push(0);
+var bugger = new bug();
+
 
 //Тик
 function tick() {
@@ -154,20 +176,22 @@ function tick() {
 		}
 	}
 
+	
 	//Персонаж
-	if(keyPressed[1] == 1 && board[div(xPos, cellSize)][div(yPos - 3, cellSize)] != 1) {
-		yPos = moveUp(yPos)
+	if(keyPressed[1] == 1) {
+		bugger.moveUp()
 	}
-	if(keyPressed[2] == 1 && board[div(xPos - 3, cellSize)][div(yPos, cellSize)] != 1) {
-		xPos = moveLeft(xPos)
+	if(keyPressed[2] == 1) {
+		bugger.moveLeft()
 	}
-	if(keyPressed[3] == 1 && board[div(xPos, cellSize)][div(yPos + 3, cellSize)] != 1) {
-		yPos = moveDown(yPos)
+	if(keyPressed[3] == 1) {
+		bugger.moveDown()
 	}
-	if(keyPressed[4] == 1 && board[div(xPos + 3, cellSize)][div(yPos, cellSize)] != 1) {
-		xPos = moveRight(xPos)
+	if(keyPressed[4] == 1) {
+		bugger.moveRight()
 	}
-	ctx.fillRect(xPos, yPos, 3, 3);
+	
+	ctx.fillRect(bugger.xPos, bugger.yPos, 3, 3);
 	
 }
 
