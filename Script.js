@@ -7,11 +7,15 @@ Board:
 	3 - food
 */
 
+//---------------------------------------------------------------------------------------------------------------------------
+
 //Настройка холста
 var screen = document.getElementById("bge"),
     ctx = screen.getContext('2d');
 screen.width  = 640;
 screen.height = 640;
+
+//---------------------------------------------------------------------------------------------------------------------------
 
 //Настройка доски
 var board = [];
@@ -44,17 +48,29 @@ for (var i = 0; i < boardSize; i++) {
 	board[boardSize - 1][i] = 1;
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------------
+
+
 //Импорт картинок
 var picGround = new Image();
 	picGround.src = "Images/ground.png";
 var picRock = new Image();
 	picRock.src = "Images/rock.png";
 
+	
+//---------------------------------------------------------------------------------------------------------------------------
+	
+	
 //Переменные
 var bugNumber = 0;
 var foodNumber = 0;
 var keyPressed = [0, 0, 0, 0, 0]; //w, a, s, d
 var key;
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+
 
 //Функции	
 function getRandomInt(min, max) {
@@ -63,6 +79,9 @@ function getRandomInt(min, max) {
 function div(x, y) {
 	return(Math.floor(x / y));
 }
+
+
+//---------------------------------------------------------------------------------------------------------------------------
 
 
 //События
@@ -105,55 +124,88 @@ function checkUp(e) {
 	}
 }
 
+
+//---------------------------------------------------------------------------------------------------------------------------
+
+
 //Массив объектов
 var bugs = [];
 var foodCells = [];
 
+
+//---------------------------------------------------------------------------------------------------------------------------
+
+
 //Класс
 class bug {
-	constructor() {
-		this.xPos = 40;
-		this.yPos = 40;
+	constructor(xPos, yPos, speed) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.speedX = speed;
+		this.speedY = speed;
+		this.stepCount;
 	}
+	
 	moveUp() {
-		if (board[div(this.xPos, cellSize)][div(this.yPos - 3, cellSize)] == 0) {
-			this.yPos = this.yPos - 3;
+		if (board[div(this.xPos, cellSize)][div(this.yPos - this.speedY, cellSize)] == 0) {
+			this.yPos = this.yPos - this.speedY;
 		}
 	}
 	moveDown() {
-		if (board[div(this.xPos, cellSize)][div(this.yPos + 3, cellSize)] == 0) {
-			this.yPos = this.yPos + 3;
+		if (board[div(this.xPos, cellSize)][div(this.yPos + this.speedY, cellSize)] == 0) {
+			this.yPos = this.yPos + this.speedY;
 		}
 	}
 	moveLeft() {
-		if (board[div(this.xPos - 3, cellSize)][div(this.yPos, cellSize)] == 0) {
-			this.xPos = this.xPos - 3;
+		if (board[div(this.xPos - this.speedX, cellSize)][div(this.yPos, cellSize)] == 0) {
+			this.xPos = this.xPos - this.speedX;
 		}
 	}
 	moveRight() {
-		if (board[div(this.xPos + 3, cellSize)][div(this.yPos, cellSize)] == 0) {
-			this.xPos = this.xPos + 3;
+		if (board[div(this.xPos + this.speedX, cellSize)][div(this.yPos, cellSize)] == 0) {
+			this.xPos = this.xPos + this.speedX;
 		}
 	}
+	moveX(a) {
+		if (board[div(this.xPos + a, cellSize)][div(this.yPos, cellSize)] == 0) {
+			this.xPos = this.xPos + a;
+		}
+	}
+	moveY(a) {
+		if (board[div(this.xPos, cellSize)][div(this.yPos + a, cellSize)] == 0) {
+			this.yPos = this.yPos + a;
+		}
+	}
+	
+	lifeTick() {
+		
+	}
+	
 }
 
 class foodCell {
 	constructor(x, y) {
-		this.xCell = div(x, 32);
-		this.yCell = div(y, 32);
+		this.xCell = div(x, cellSize);
+		this.yCell = div(y, cellSize);
 	}
 	
 }
 
 function tester(a, b) {
-	var FoodCell = new foodCell(a, b)
+	var FoodCell = new foodCell(a, b);
 	FoodCell.foodCellPosition();
-	console.log(screen.offsetTop)
+	console.log(screen.offsetTop);
 }
 
+var bugger = new bug(40, 40, 2);
 
-bugs.push(0);
-var bugger = new bug();
+for (var i = 0; i < 10; i++) {
+	bugs.push(0);
+	bugs[bugNumber] = new bug(40, 40, 2);
+	bugNumber++;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
 
 
 //Тик
@@ -179,20 +231,25 @@ function tick() {
 	
 	//Персонаж
 	if(keyPressed[1] == 1) {
-		bugger.moveUp()
+		bugger.moveUp();
 	}
 	if(keyPressed[2] == 1) {
-		bugger.moveLeft()
+		bugger.moveLeft();
 	}
 	if(keyPressed[3] == 1) {
-		bugger.moveDown()
+		bugger.moveDown();
 	}
 	if(keyPressed[4] == 1) {
-		bugger.moveRight()
+		bugger.moveRight();
 	}
 	
-	ctx.fillRect(bugger.xPos, bugger.yPos, 3, 3);
-	
+	ctx.fillRect(bugger.xPos - 2, bugger.yPos - 2, 5, 5);
+	for (var i = 0; i < bugNumber; i++) {
+			bugs[i].moveX(getRandomInt(-3, 3));
+			bugs[i].moveY(getRandomInt(-3, 3));
+			bugs[i].lifeTick();
+			ctx.fillRect(bugs[i].xPos - 2, bugs[i].yPos - 2, 5, 5);
+	}
 }
 
 setInterval(tick, 10);
