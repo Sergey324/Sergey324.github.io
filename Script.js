@@ -9,6 +9,86 @@ Board:
 
 //---------------------------------------------------------------------------------------------------------------------------
 
+	
+//Переменные
+var bugNumber = 0;
+var bugs = [];
+
+var foodNumber = 0;
+var foodBoard = [];
+var foodCoord = [];
+
+var keyPressed = [0, 0, 0, 0, 0]; //w, a, s, d
+var key;
+
+var localX = 0;
+var localY = 0;
+
+var board = [];
+var boardSize = 20;
+var cellSize = 32;
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+
+
+//Класс
+class bug {
+	constructor(xPos, yPos, speed) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.speedX = speed;
+		this.speedY = speed;
+	}
+	moveX(r) {
+		this.speedX = r;
+		if (board[div(this.xPos + this.speedX, cellSize)][div(this.yPos, cellSize)].type != 1) {
+			this.xPos = this.xPos + this.speedX;
+		}
+	}
+	moveY(r) {
+		this.speedY = r;
+		if (board[div(this.xPos, cellSize)][div(this.yPos + this.speedY, cellSize)].type != 1) {
+			this.yPos = this.yPos + this.speedY;
+		}
+	}
+	
+}
+
+
+class foodCell {
+	constructor(x, y) {
+		this.xCell = x;
+		this.yCell = y;
+		this.type = 2;
+		this.lifeTime = getRandomInt(100, 300);
+	}
+}
+
+class emptyCell {
+	constructor(x, y) {
+		this.xCell = x;
+		this.yCell = y;
+		this.type = 0;
+	}
+}
+class rockCell {
+	constructor(x, y) {
+		this.xCell = x;
+		this.yCell = y;
+		this.type = 1;
+	}
+}
+
+for (var i = 0; i < 10; i++) {
+	bugs.push(0);
+	bugs[bugNumber] = new bug(40, 40, 2);
+	bugNumber++;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+
+
 //Настройка холста
 var screen = document.getElementById("bge"),
     ctx = screen.getContext('2d');
@@ -18,34 +98,32 @@ screen.height = 640;
 //---------------------------------------------------------------------------------------------------------------------------
 
 //Настройка доски
-var board = [];
-var boardSize = 20;
-var cellSize = 32;
+
 for (var i = 0; i < boardSize; i++) {
 	board.push([]);
 	for (var j = 0; j < boardSize; j++) {
-		board[i].push(0);
+		board[i].push(new emptyCell(i, j));
 	}
 }
 for (var i = 2; i < boardSize; i++) {
 		for (var j = 0; j < boardSize; j++){
 			if (getRandomInt(0, 50) == 1) {
-				board[i][j] = 1;
+				board[i][j] = new rockCell(i, j);
 			}
 		}
 	}
 	
 for (var i = 0; i < boardSize; i++) {
-	board[i][0] = 1;
+	board[i][0] = new rockCell(i, 0);
 }
 for (var i = 0; i < boardSize; i++) {
-	board[0][i] = 1;
+	board[0][i] = new rockCell(0, i);
 }
 for (var i = 0; i < boardSize; i++) {
-	board[i][boardSize - 1] = 1;
+	board[i][boardSize - 1] = new rockCell(i, boardSize - 1);
 }
 for (var i = 0; i < boardSize; i++) {
-	board[boardSize - 1][i] = 1;
+	board[boardSize - 1][i] = new rockCell(boardSize, i);
 }
 
 
@@ -63,21 +141,6 @@ var picFood = new Image();
 	
 //---------------------------------------------------------------------------------------------------------------------------
 	
-	
-//Переменные
-var bugNumber = 0;
-
-
-var foodNumber = 0;
-var deadFoodCells = [];
-
-var keyPressed = [0, 0, 0, 0, 0]; //w, a, s, d
-var key;
-
-var localX = 0;
-var localY = 0;
-
-//---------------------------------------------------------------------------------------------------------------------------
 
 
 //Функции	
@@ -91,16 +154,19 @@ function div(x, y) {
 function lifeBugTick(obj) {
 	obj.moveX(getRandomInt(-5, 5));
 	obj.moveY(getRandomInt(-5, 5));
+	var a = div(obj.xPos, cellSize);
+	var b = div(obj.yPos, cellSize);
 	
 }
 
 function lifeFoodTick(i) {
-	if (foodCells[i].lifeTime > 0) {
-		foodCells[i].aging();
+	if (i.lifeTime > 0) {
+		i.lifeTime = i.lifeTime - 1;
 	}
 	else {
-		foodCells.splice(i, 1);
+		board[i.xCell][i.yCell] = new emptyCell(i.xCell, i.yCell);
 		foodNumber = foodNumber - 1;
+		
 	}
 }
 
@@ -153,100 +219,6 @@ function checkUp(e) {
 	}
 }
 
-if(keyPressed[1] == 1) {
-	bugger.moveUp();
-}
-if(keyPressed[2] == 1) {
-	bugger.moveLeft();
-}
-if(keyPressed[3] == 1) {
-	bugger.moveDown();
-}
-if(keyPressed[4] == 1) {
-	bugger.moveRight();
-}
-	
-
-//---------------------------------------------------------------------------------------------------------------------------
-
-
-//Массив объектов
-var bugs = [];
-var foodCells = [];
-var foodCeller = [0];
-
-
-//---------------------------------------------------------------------------------------------------------------------------
-
-
-//Класс
-class bug {
-	constructor(xPos, yPos, speed) {
-		this.xPos = xPos;
-		this.yPos = yPos;
-		this.speedX = speed;
-		this.speedY = speed;
-		this.stepCount;
-	}
-	
-	moveUp() {
-		if (board[div(this.xPos, cellSize)][div(this.yPos - this.speedY, cellSize)] == 0) {
-			this.yPos = this.yPos - this.speedY;
-		}
-	}
-	moveDown() {
-		if (board[div(this.xPos, cellSize)][div(this.yPos + this.speedY, cellSize)] == 0) {
-			this.yPos = this.yPos + this.speedY;
-		}
-	}
-	moveLeft() {
-		if (board[div(this.xPos - this.speedX, cellSize)][div(this.yPos, cellSize)] == 0) {
-			this.xPos = this.xPos - this.speedX;
-		}
-	}
-	moveRight() {
-		if (board[div(this.xPos + this.speedX, cellSize)][div(this.yPos, cellSize)] == 0) {
-			this.xPos = this.xPos + this.speedX;
-		}
-	}
-	moveX(a) {
-		if (board[div(this.xPos + a, cellSize)][div(this.yPos, cellSize)] != 1) {
-			this.xPos = this.xPos + a;
-		}
-	}
-	moveY(a) {
-		if (board[div(this.xPos, cellSize)][div(this.yPos + a, cellSize)] != 1) {
-			this.yPos = this.yPos + a;
-		}
-	}
-	
-
-	
-}
-
-class foodCell {
-	constructor(x, y) {
-		this.lifeTime = getRandomInt(100, 300);
-		this.xCell = x;
-		this.yCell = y;		
-		foodNumber++;		
-	}
-	aging () {
-		this.lifeTime = this.lifeTime - 1;
-	}
-}
-
-
-
-
-	
-var bugger = new bug(40, 40, 2);
-
-for (var i = 0; i < 10; i++) {
-	bugs.push(0);
-	bugs[bugNumber] = new bug(40, 40, 2);
-	bugNumber++;
-}
 
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -258,37 +230,29 @@ function tick() {
 	//Отрисовка поля	
 	for (var i = 0; i < boardSize; i++) {
 		for (var j = 0; j < boardSize; j++){
-			switch (board[i][j]) {
+			switch (board[i][j].type) {
 				case 0:
 					ctx.drawImage(picGround, 0 + i * cellSize, 0 + j * cellSize);
 					break;
 				case 1:
 					ctx.drawImage(picRock, 0 + i * cellSize, 0 + j * cellSize);
 					break;
-				default:
-					ctx.drawImage(picGround, 0 + i * cellSize, 0 + j * cellSize);
+				case 2:
+					lifeFoodTick(board[i][j]);
+					ctx.drawImage(picFood, 0 + i * cellSize, 0 + j * cellSize);
 					break;
 			}
 		}
 	}
 	
 	
-	localX = parseInt(getRandomInt(0, 19));
-	localY = parseInt(getRandomInt(0, 19));
+	localX = getRandomInt(0, 19);
+	localY = getRandomInt(0, 19);
 	
-	if (board[localX][localY] == 0 && getRandomInt(0, 50) ==  1){
-		foodCells[foodNumber] = new foodCell(localX, localY);
-		board[localX][localY] = 2;
+	if (board[localX][localY].type == 0 && getRandomInt(0, 15) ==  1){
+		board[localX][localY] = new foodCell(localX, localY);
 	}
 
-	
-	for (var i = foodCells.length - 1; i >= 0; i = i - 1) {
-		ctx.drawImage(picFood, foodCells[i].xCell * 32, foodCells[i].yCell * 32);
-		lifeFoodTick(i);
-	}
-	
-	
-	ctx.fillRect(bugger.xPos - 2, bugger.yPos - 2, 5, 5);
 	for (var i = 0; i < bugNumber; i++) {
 		lifeBugTick(bugs[i]);
 		ctx.fillRect(bugs[i].xPos - 2, bugs[i].yPos - 2, 5, 5);
