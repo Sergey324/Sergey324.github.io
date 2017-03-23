@@ -15,8 +15,7 @@ var bugNumber = 0;
 var bugs = [];
 
 var foodNumber = 0;
-var foodBoard = [];
-var foodCoord = [];
+var foodCells = [];
 
 var keyPressed = [0, 0, 0, 0, 0]; //w, a, s, d
 var key;
@@ -25,7 +24,7 @@ var localX = 0;
 var localY = 0;
 
 var board = [];
-var boardSize = 20;
+var boardSize = 25;
 var cellSize = 32;
 
 
@@ -34,11 +33,14 @@ var cellSize = 32;
 
 //Класс
 class bug {
-	constructor(xPos, yPos, speed) {
+	constructor(number, xPos, yPos, speed, saturation) {
+		this.number = number;
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.speedX = speed;
 		this.speedY = speed;
+		this.saturation = saturation;
+		this.sys;
 	}
 	moveX(r) {
 		this.speedX = r;
@@ -52,7 +54,26 @@ class bug {
 			this.yPos = this.yPos + this.speedY;
 		}
 	}
+	bugNavigation () {
+		
+	}
+	lifeBugTick(number) {
+		this.number = number;
+		this.saturation = this.saturation - 1;
+		this.moveX(getRandomInt(-5, 5));
+		this.moveY(getRandomInt(-5, 5));
+		if (this.saturation == 0){
+			bugs.splice(this.number, 1);
+			console.log("(_*_)");
+			bugNumber = bugNumber - 1;
+		}
+		if (board[div(this.xPos, cellSize)][div(this.yPos, cellSize)].type == 2) {
+			this.saturation = this.saturation + 100;
+			board[div(this.xPos, cellSize)][div(this.yPos, cellSize)].lifeTime = board[div(this.xPos, cellSize)][div(this.yPos, cellSize)].lifeTime - 1;
+		}		
+	}
 	
+
 }
 
 
@@ -61,9 +82,16 @@ class foodCell {
 		this.xCell = x;
 		this.yCell = y;
 		this.type = 2;
-		this.lifeTime = getRandomInt(100, 300);
+		this.lifeTime = getRandomInt(10, 30);
+	}
+	lifeFoodTick() {
+		if (this.lifeTime <= 0) {
+			board[this.xCell][this.yCell] = new emptyCell(this.xCell, this.yCell);
+			foodNumber = foodNumber - 1;
+		}
 	}
 }
+
 
 class emptyCell {
 	constructor(x, y) {
@@ -82,7 +110,7 @@ class rockCell {
 
 for (var i = 0; i < 10; i++) {
 	bugs.push(0);
-	bugs[bugNumber] = new bug(40, 40, 2);
+	bugs[bugNumber] = new bug(i, 40, 40, 2, getRandomInt(100, 10000));
 	bugNumber++;
 }
 
@@ -90,10 +118,9 @@ for (var i = 0; i < 10; i++) {
 
 
 //Настройка холста
-var screen = document.getElementById("bge"),
-    ctx = screen.getContext('2d');
-screen.width  = 640;
-screen.height = 640;
+var screen = document.getElementById("bge"), ctx = screen.getContext('2d');
+screen.width  = boardSize * cellSize;
+screen.height = boardSize * cellSize;
 
 //---------------------------------------------------------------------------------------------------------------------------
 
@@ -151,23 +178,23 @@ function div(x, y) {
 	return(Math.floor(x / y));
 }
 
-function lifeBugTick(obj) {
-	obj.moveX(getRandomInt(-5, 5));
-	obj.moveY(getRandomInt(-5, 5));
-	var a = div(obj.xPos, cellSize);
-	var b = div(obj.yPos, cellSize);
-	
+function getMaxElem(array){
+    var max = array[0];
+    for (var i = 0; i < array.length; i++) { 
+        if (max < array[i]){
+			max = i
+		}
+    }
+    return max;
 }
-
-function lifeFoodTick(i) {
-	if (i.lifeTime > 0) {
-		i.lifeTime = i.lifeTime - 1;
-	}
-	else {
-		board[i.xCell][i.yCell] = new emptyCell(i.xCell, i.yCell);
-		foodNumber = foodNumber - 1;
-		
-	}
+function getMinElem(array){
+    var min = array[0];
+    for (var i = 0; i < array.length; i++) { 
+        if (min < array[i]){
+			min = i
+		}
+    }
+    return min;
 }
 
 
@@ -227,6 +254,7 @@ function checkUp(e) {
 //Тик
 function tick() {
 	
+
 	//Отрисовка поля	
 	for (var i = 0; i < boardSize; i++) {
 		for (var j = 0; j < boardSize; j++){
@@ -238,27 +266,37 @@ function tick() {
 					ctx.drawImage(picRock, 0 + i * cellSize, 0 + j * cellSize);
 					break;
 				case 2:
-					lifeFoodTick(board[i][j]);
+					board[i][j].lifeFoodTick();
 					ctx.drawImage(picFood, 0 + i * cellSize, 0 + j * cellSize);
 					break;
 			}
 		}
 	}
 	
+	foodCells = [];
 	
-	localX = getRandomInt(0, 19);
-	localY = getRandomInt(0, 19);
+	for (var i = 0; i < boardSize; i++) {
+		for (var j = 0; j < boardSize; j++) {
+			if(board[i][j].type == 2) {
+				foodCells.push(board[i][j]);
+			}
+		}
+	}
+	
+	
+	localX = getRandomInt(0, boardSize - 1);
+	localY = getRandomInt(0, boardSize - 1);
 	
 	if (board[localX][localY].type == 0 && getRandomInt(0, 15) ==  1){
 		board[localX][localY] = new foodCell(localX, localY);
 	}
 
 	for (var i = 0; i < bugNumber; i++) {
-		lifeBugTick(bugs[i]);
+		bugs[i].lifeBugTick(i);
 		ctx.fillRect(bugs[i].xPos - 2, bugs[i].yPos - 2, 5, 5);
 	}
 	
 	
 }
 
-setInterval(tick, 10);
+setInterval(tick, 20);
