@@ -39,32 +39,52 @@ class bug {
 		this.yPos = yPos;
 		this.speedX = speed;
 		this.speedY = speed;
+		this.moveX = speed;
+		this.moveY = speed;
 		this.saturation = saturation;
-		this.sys;
+		this.loc; //location
+		this.sys1;
+		this.sys2;
+		this.moveSin;
+		this.moveCos;
 	}
-	moveX(r) {
-		this.speedX = r;
-		if (board[div(this.xPos + this.speedX, cellSize)][div(this.yPos, cellSize)].type != 1) {
-			this.xPos = this.xPos + this.speedX;
+	movementX(r) {
+		if (board[div(this.xPos + this.moveX, cellSize)][div(this.yPos, cellSize)].type != 1) {
+			this.xPos = this.xPos + this.moveX;
 		}
 	}
-	moveY(r) {
-		this.speedY = r;
-		if (board[div(this.xPos, cellSize)][div(this.yPos + this.speedY, cellSize)].type != 1) {
-			this.yPos = this.yPos + this.speedY;
+	movementY(r) {
+		if (board[div(this.xPos, cellSize)][div(this.yPos + this.moveY, cellSize)].type != 1) {
+			this.yPos = this.yPos + this.moveY;
 		}
 	}
+	findNearestCell(foodCells) {
+		this.sys1 = [];
+		for (var i = 0; i < foodCells.length; i++) {
+			this.sys1.push(foodCells[this.number]);			
+		}
+		this.loc = getMinElem(this.sys1);
+	}
+	
 	bugNavigation () {
+		
+		this.moveSin = (this.xPos - this.loc.xPos) / (Math.sqrt(Math.pow(this.xPos - this.loc.xPos, 2) + Math.pow(this.yPos - this.loc.yPos, 2)));
+		this.moveCos = (this.yPos - this.loc.yPos) / (Math.sqrt(Math.pow(this.xPos - this.loc.xPos, 2) + Math.pow(this.yPos - this.loc.yPos, 2)));
+		this.moveX = this.moveSin * this.speedX * -1;
+		this.moveY = this.moveCos * this.speedY * -1;
+
 		
 	}
 	lifeBugTick(number) {
 		this.number = number;
 		this.saturation = this.saturation - 1;
-		this.moveX(getRandomInt(-5, 5));
-		this.moveY(getRandomInt(-5, 5));
+		this.findNearestCell(foodCells);
+		this.bugNavigation();
+		this.movementX();
+		this.movementY();
 		if (this.saturation == 0){
 			bugs.splice(this.number, 1);
-			console.log("(_*_)");
+			console.log("death");
 			bugNumber = bugNumber - 1;
 		}
 		if (board[div(this.xPos, cellSize)][div(this.yPos, cellSize)].type == 2) {
@@ -81,14 +101,23 @@ class foodCell {
 	constructor(x, y) {
 		this.xCell = x;
 		this.yCell = y;
+		this.xPos = this.xCell * cellSize + div(cellSize, 2);
+		this.yPos = this.yCell * cellSize + div(cellSize, 2);
 		this.type = 2;
 		this.lifeTime = getRandomInt(10, 30);
+		this.dist = [];
 	}
 	lifeFoodTick() {
 		if (this.lifeTime <= 0) {
 			board[this.xCell][this.yCell] = new emptyCell(this.xCell, this.yCell);
 			foodNumber = foodNumber - 1;
 		}
+		else {
+			for (var i = 0; i < bugs.length; i ++) {
+				this.dist.push(Math.sqrt(Math.pow(this.xPos - bugs[i].xPos, 2) + Math.pow(this.yPos - bugs[i].yPos, 2)));
+			}
+		}
+		
 	}
 }
 
@@ -287,7 +316,7 @@ function tick() {
 	localX = getRandomInt(0, boardSize - 1);
 	localY = getRandomInt(0, boardSize - 1);
 	
-	if (board[localX][localY].type == 0 && getRandomInt(0, 15) ==  1){
+	if (board[localX][localY].type == 0 && getRandomInt(0, 50) ==  1){
 		board[localX][localY] = new foodCell(localX, localY);
 	}
 
@@ -299,4 +328,4 @@ function tick() {
 	
 }
 
-setInterval(tick, 20);
+setInterval(tick, 10);
