@@ -22,6 +22,9 @@ var key;
 var localX = 0;
 var localY = 0;
 
+var mouseX = 0;
+var mouseY = 0;
+
 var board = [];
 var boardSize = 25;
 var cellSize = 32;
@@ -125,6 +128,8 @@ class rockCell {
 		this.xCell = x;
 		this.yCell = y;
 		this.type = 1;
+		this.moveX;
+		this.moveY;
 	}
 }
 
@@ -133,6 +138,8 @@ class aim {
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.speed = speed;
+		this.moveX = 1;
+		this.moveY = 1;
 
 	}
 	movementX(r) {
@@ -144,6 +151,13 @@ class aim {
 		if (board[div(this.xPos, cellSize)][div(this.yPos + r, cellSize)].type != 1) {
 			this.yPos = this.yPos + r;
 		}
+	}
+	
+	aimNavigation () {3
+		this.moveSin = (mouseY - this.yPos) / (Math.sqrt(Math.pow(this.xPos - mouseX, 2) + Math.pow(this.yPos - mouseY, 2)));
+		this.moveCos = (mouseX - this.xPos) / (Math.sqrt(Math.pow(this.xPos - mouseX, 2) + Math.pow(this.yPos - mouseY, 2)));
+		this.moveX = this.moveCos * this.speed;
+		this.moveY = this.moveSin * this.speed;
 	}
 	movement() {
 		if (keyPressed[0] == 1) {
@@ -158,7 +172,11 @@ class aim {
 		if (keyPressed[3] == 1) {
 			this.movementX(this.speed);
 		}
-		
+		this.aimNavigation();
+		if ((Math.sqrt(Math.pow(this.xPos - mouseX, 2) + Math.pow(this.yPos - mouseY, 2))) >= this.speed){
+			this.movementX(this.moveX);
+			this.movementY(this.moveY);
+		}
 		
 	}
 	
@@ -261,6 +279,11 @@ function getMinElem(arr){
 	}
 }
 
+function mouseMovement(x, y) {
+	mouseX = x - screen.getBoundingClientRect().left;
+	mouseY = y - screen.getBoundingClientRect().top;
+	
+}
 //---------------------------------------------------------------------------------------------------------------------------
 
 //События
@@ -308,7 +331,7 @@ function checkUp(e) {
 	}
 }
 
-var target = new aim(40, 40, 5);
+var target = new aim(40, 40, 10);
 
 //---------------------------------------------------------------------------------------------------------------------------
 
