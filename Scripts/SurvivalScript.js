@@ -4,7 +4,7 @@
 
 var boardXSize = 400;
 var boardYSize = 400;
-var cellSize = 20;
+var cellSize = 40;
 var cameraX = 0;
 var cameraY = 0;
 var cameraSpeed = 5;
@@ -16,6 +16,10 @@ screen.height = 1000;
 
 // Images ------------------------------------------------------------------------------------------------------------
 
+var picChar = new Image();
+	picChar.src = "Survival/Images/Characters/Char.png";
+var picTree = new Image();
+	picTree.src = "Survival/Images/ForestBiome/Oak2.png";
 
 
 // Variables ------------------------------------------------------------------------------------------------------------
@@ -24,6 +28,7 @@ var board = [];
 var keyPressed = [0, 0, 0, 0]; //w, a, s, d
 var key;
 var biomeSpreading = 100;
+var visObjects = [];
 
 // Functions ------------------------------------------------------------------------------------------------------------
 
@@ -44,6 +49,25 @@ function neighbourCounter(arr, i, j, type) {
 	return(s);
 	
 }
+
+function neighbourBiomeCounter(arr, i, j, biome) {
+	var s = 0;
+	if (arr[i][j - 1].biome == biome) {
+		s++;
+	}
+	if (arr[i][j + 1].biome == biome) {
+		s++;
+	}
+	if (arr[i - 1][j].biome == biome) {
+		s++;
+	}
+	if (arr[i + 1][j].biome == biome) {
+		s++;
+	}
+	return(s);
+	
+}
+
 
 // Classes ------------------------------------------------------------------------------------------------------------
 
@@ -95,13 +119,21 @@ var cam = new camera();
 
 class emptyCell {
 	
-	constructor(x, y) {
+	constructor(x, y, biome) {
 		this.xCell = x;
 		this.yCell = y;
 		this.xPos = this.xCell * cellSize - cam.xPos + screen.width / 2;
 		this.yPos = this.yCell * cellSize - cam.yPos + screen.height / 2;
 		this.type = 0;
-		this.color = ("rgb" + "(" + String(60 + getRandomInt(-10, 10)) + ", " + String(170 + getRandomInt(-10, 10)) + ", " + String(60 + getRandomInt(-10, 10)) + ")");
+		this.biome = biome;
+		switch (this.biome) {
+			case 0:
+				this.color = ("rgb" + "(" + String(60 + getRandomInt(-10, 10)) + ", " + String(170 + getRandomInt(-10, 10)) + ", " + String(60 + getRandomInt(-10, 10)) + ")");
+				break;
+			case 1:
+				this.color = ("rgb" + "(" + String(120 + getRandomInt(-10, 10)) + ", " + String(250 + getRandomInt(-10, 10)) + ", " + String(10 + getRandomInt(-10, 10)) + ")");
+				break;
+		}
 	}
 	
 	cellTick() {
@@ -142,16 +174,62 @@ class waterCell {
 	}
 }
 
+class treeCell {
+	constructor(x, y) {
+		this.xCell = x;
+		this.yCell = y;
+		this.xPos = this.xCell * cellSize - cam.xPos  + screen.width / 2;
+		this.yPos = this.yCell * cellSize - cam.yPos + screen.height / 2;
+		this.type = 3;
+		this.color = ("rgb" + "(" + String(60 + getRandomInt(-10, 10)) + ", " + String(170 + getRandomInt(-10, 10)) + ", " + String(60 + getRandomInt(-10, 10)) + ")");
+	}
+	cellTick() {
+		this.xPos = this.xCell * cellSize - cam.xPos  + screen.width / 2;
+		this.yPos = this.yCell * cellSize - cam.yPos + screen.height / 2;
+	}
+}
+
+class tree {
+	constructor(x, y) {
+		this.xPos = x * cellSize - cam.xPos  + screen.width / 2;
+		this.yPos = y * cellSize - cam.yPos  + screen.height / 2;
+		this.visX = this.xPos - 12;
+		this.visY = this.yPos - 96;
+		this.pic = picTree;
+		
+	}
+	
+}
+
+class character {
+	constructor() {
+		this.xPos = screen.width / 2;
+		this.yPos = screen.height / 2;
+		this.visX = this.xPos - 16;
+		this.visY = this.yPos - 32;
+		this.pic = picChar;
+		
+	}
+	
+}
+
+var visChar = new character();
+
 // Board ------------------------------------------------------------------------------------------------------------
 
 for (var i = 0; i < boardXSize; i++) {
 	board.push([]);
 	for (var j = 0; j < boardYSize; j++) {
-		if (getRandomInt(0, 150) == 1){
-			board[i].push(new rockCell(i, j));;
+		if (getRandomInt(0, 10) == 0){
+			if (getRandomInt(0, 4) != 1) {
+				board[i].push(new treeCell(i, j));
+			}
+			else {
+				board[i].push(new rockCell(i, j));
+			}
 		}
 		else {
-			board[i].push(new emptyCell(i, j));
+				board[i].push(new emptyCell(i, j, 0));
 		}
 	}
 }
@@ -212,10 +290,29 @@ function checkUp(e) {
 
 
 // Biome generator ------------------------------------------------------------------------------------------------------ 
-
 for (var i = 1; i < boardXSize - 1; i++) {
 	for (var j = 1; j < boardYSize - 1; j++){
 		if (getRandomInt(0, 500) == 0) {
+			board[i][j] = new emptyCell(i, j, 1);
+		}
+	}	
+}
+
+for (var k = 0; k < biomeSpreading; k++) {
+	for (var i = 1; i < boardXSize - 1; i++) {
+		for (var j = 1; j < boardYSize - 1; j++){
+			if (Math.pow(neighbourBiomeCounter(board, i, j, 1), 3) >= getRandomInt(0, 50) && neighbourBiomeCounter(board, i, j, 1) != 0) {
+				board[i][j] = new emptyCell(i, j, 1);
+			}
+		}	
+	}
+}
+
+
+
+for (var i = 1; i < boardXSize - 1; i++) {
+	for (var j = 1; j < boardYSize - 1; j++){
+		if (getRandomInt(0, 1000) == 0) {
 			board[i][j] = new waterCell(i, j);
 		}
 	}	
@@ -232,9 +329,24 @@ for (var k = 0; k < biomeSpreading; k++) {
 	}
 }
 
+board[10][10] = new emptyCell(10, 10, 1);
+for (var k = 0; k < 30; k++) {
+	for (var i = 1; i < boardXSize - 1; i++) {
+		for (var j = 1; j < boardYSize - 1; j++){
+			if (Math.pow(neighbourBiomeCounter(board, i, j, 1), 3) >= getRandomInt(0, 50) && neighbourBiomeCounter(board, i, j, 1) != 0) {
+				board[i][j] = new emptyCell(i, j, 1);
+			}
+		}	
+	}
+}
+
+
+
 // Tick ------------------------------------------------------------------------------------------------------------
 
 function tick() {
+	visObjects = []
+	visObjects.push(visChar);
 	ctx.fillStyle = "white";
 	ctx.fillRect(0, 0, screen.width, screen.height);
 	for (var i = 0; i < boardXSize; i++) {
@@ -262,12 +374,27 @@ function tick() {
 						ctx.fillRect(board[i][j].xPos, board[i][j].yPos, cellSize, cellSize);
 					}
 					break;
+				case 3:
+					board[i][j].cellTick();
+					if (board[i][j].xPos > 0 - cellSize && board[i][j].yPos > 0 - cellSize && board[i][j].xPos < screen.width + 100 && board[i][j].yPos < screen.height + 100) {
+						ctx.fillStyle = (board[i][j].color);
+						ctx.fillRect(board[i][j].xPos, board[i][j].yPos, cellSize, cellSize);
+						visObjects.push(new tree(i, j));
+					}
+					break;
 			}
 		}
 	}
 	
-	ctx.fillStyle = "black";
-	ctx.fillRect(screen.width / 2, screen.height / 2, 5, 5);
+	for (var i = 0; i < screen.height; i++) {
+		for (var j = visObjects.length - 1; j >= 0; j = j - 1) {
+			if (visObjects[j].yPos == i) {
+				ctx.drawImage(visObjects[j].pic, visObjects[j].visX, visObjects[j].visY);
+				visObjects.splice(j, 1);
+			}
+		}
+	}
+	//ctx.drawImage(picChar, screen.width / 2 - 16, screen.height/2 - 32);
 	cam.cameraMovement();
 }
 
