@@ -1,40 +1,22 @@
-html{
-	font-family:segoe;
-}
-.mainsign{ 
-	color: #FFFFFF;
-    line-height: 300%; 
-    text-align:left;
-}
-header { 
-    background: #464677;
-    line-height: 300%; 
-	font-family: segoe;
-	height:170px;
-}
 body { 
 	background: #0C0C15; 
 }
-#leftside { 
+
+.block {
+	position: absolute;
 	background: #E0E0F2;
-	padding: 20px;
-	width:150px;
 }
-#center {
-	background: #E0E0F2;
-	padding: 20px;
+.block:hover {
+	position: absolute;
+	background: #FFFFFF;
 }
-#leftpic {
-	align: left;
+.mainstring {
+	color: #FFFFFF;
 }
-a {
-	text-decoration: none;
-	color:#000075;
+
+#logo {
+	position: absolute;
 }
-table {
-	width:100%;
-	align: top;
-}
-a:visited {
-	color:#000075;
+#str {
+	position: absolute;
 }
