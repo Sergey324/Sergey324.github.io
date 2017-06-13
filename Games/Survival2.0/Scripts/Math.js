@@ -1,11 +1,12 @@
 "use strict";
+
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 function div(x, y) {
 	return(Math.floor(x / y));
 }
-
 
 function random(a, b, iter) {
 		var q = 0;
@@ -14,8 +15,7 @@ function random(a, b, iter) {
 		}
 		q = Math.round(q / iter);
 		return q;
-	}
-	
+}
 
 function getMaxElem(arr){
 	if (arr.length != 0) {
@@ -29,6 +29,7 @@ function getMaxElem(arr){
 		return maxElem;
 	}
 }
+
 function getMinElem(arr){
 	if (arr.length != 0) {
 		var min = arr[0];
@@ -41,4 +42,32 @@ function getMinElem(arr){
 		return minElem;
 	}
 }
+
+function digit(x){
+	return(x / Math.abs(x));
+}
+
+function boolToInt(x){
+	return((Number(x) - 0.5) * 2);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

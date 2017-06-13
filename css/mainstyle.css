@@ -1,10 +1,10 @@
 body { 
-	background: #0C0C15; 
+	background: #007FFF; 
 }
 
 .block {
 	position: absolute;
-	background: #E0E0F2;
+	background: #C8E6FD;
 }
 .block:hover {
 	position: absolute;

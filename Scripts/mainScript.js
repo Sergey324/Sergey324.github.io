@@ -10,7 +10,7 @@ var list = [["survival2", 0, 0, 0, 1, "<img src='Pictures/MainPageIcons/Survival
 			["bees", 2, 2, 1, 3, "<img src='Pictures/MainPageIcons/Bees.png' align = 'middle'>", "Games/Bees/index.html"], 
 			["about", 0, 0, 2, 4, "<img src='Pictures/MainPageIcons/About.png' align = 'middle'>", "Games/Survival2.0/index.html"],
 			["tenger", 4, 4, 1, 4, "<img src='Pictures/MainPageIcons/Tenger.png' align = 'middle'>", "https://starik-tenger.github.io/"], 
-			["wiki", 3, 3, 1, 1, "<img src='Pictures/MainPageIcons/Wiki.png' align = 'middle'>", "Games/Survival2.0/index.html"], 
+			["wiki", 3, 3, 1, 1, "<img src='Pictures/MainPageIcons/Wiki.png' align = 'middle'>", "https://www.wikipedia.org/"], 
 			["recurs", 3, 3, 2, 4, "<img src='Pictures/MainPageIcons/Recurs.png' align = 'middle'>", "https://sergey324.github.io"], 
 			["omfs2", 1, 2, 4, 4, "<img src='Pictures/MainPageIcons/Fire.png' align = 'middle'>", "https://www.yandex.ru/"]];
 
@@ -77,7 +77,7 @@ function tick() {
 	for (var i = 0; i < list.length; i++){
 		adapt(blocks[i].elem, blocks[i].uBord, blocks[i].dBord, blocks[i].lBord, blocks[i].rBord);
 	}
-	adapt(mainlogo, 1, 1, 1, 1);
+	adapt(mainlogo, 1, 1, 1, 3);
 }
 
 setInterval(tick, 5000);

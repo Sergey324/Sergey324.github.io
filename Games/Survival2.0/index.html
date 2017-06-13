@@ -1,18 +1,17 @@
-<!DOCTYPE HTML>
+<!DOCTYPE HTML> <!-- Survival v 2.0 -->
 <html>
 	<head>
 		<title>Survival 2</title>
 		<meta charset= "utf-8">
 		<style>
+			body {
+				margin: 0;
+				padding: 0;
+			}
 		</style>
 	</head>
-	<body>
-		<main>
-			<p>
-				<canvas id="bge">Ваш браузер - гавно. Качайте новый.</canvas>
-			</p>
-		</main>
-	</body>
+	<body onmousemove = "mouseMoved(event.pageX, event.pageY)">
+		<canvas id="bge">Ваш браузер - гавно. Качайте новый.</canvas>
 	<script src = "Scripts/Math.js"></script>
 	<script src = "Scripts/Survival2Script.js"></script>
 </html>
