@@ -51,7 +51,9 @@ function boolToInt(x){
 	return((Number(x) - 0.5) * 2);
 }
 
-
+function pifagor(a, b) {
+	return(Math.sqrt(a * a + b * b));
+}
 
 
 

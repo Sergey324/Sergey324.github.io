@@ -109,8 +109,8 @@ class Player {
 		var sin;
 		var cos;
 		
-		sin = (xMouse - screen.width / 2) / (useDist * blockSize);
-		cos = (yMouse - screen.height / 2) / (useDist * blockSize);
+		sin = (xMouse - screen.width / 2) / (pifagor(xMouse - screen.width / 2, yMouse - screen.height / 2));
+		cos = (yMouse - screen.height / 2) / (pifagor(xMouse - screen.width / 2, yMouse - screen.height / 2));
 		
 		for (var i = 0; i < useDist * blockSize; i++) {
 			if (div(player.xPos + i * sin, blockSize) >= 0 && div(player.yPos + i * cos, blockSize) >= 0 && foreground[div(player.xPos + i * sin, blockSize)][div(player.yPos + i * cos, blockSize)] != null) {

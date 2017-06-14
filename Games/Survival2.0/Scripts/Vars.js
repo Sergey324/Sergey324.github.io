@@ -51,7 +51,7 @@ var heightMap;
 var biomeMap;
 
 var player;
-var useDist = 10;
+var useDist = 5;
 
 var xMouse;
 var yMouse;
