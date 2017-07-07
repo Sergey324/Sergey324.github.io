@@ -1,16 +1,14 @@
 class Block {
-	constructor(x, y, type, r, g, b) {
-		this.isSelected;
-		this.xCell = x;
-		this.yCell = y;
+	constructor(type, l) {
 		this.type = type;
-		this.colour = ("rgb" + "(" + String(blockColours[this.type][0] + getRandomInt(-1 * colourNoize, colourNoize)) + ", " + String(blockColours[this.type][1] + getRandomInt(-1 * colourNoize, colourNoize)) + ", " + String(blockColours[this.type][2] + getRandomInt(-1 * colourNoize, colourNoize)) + ")");
+		this.lay = l;
+		this.color = ("rgb(" + String(blocks[this.type].r + getRandomInt(-1 * blocks[this.type].noize, blocks[this.type].noize) - this.lay * 30) + ", " + String(blocks[this.type].g + getRandomInt(-1 * blocks[this.type].noize, blocks[this.type].noize) - this.lay * 30) + ", " + String(blocks[this.type].b + getRandomInt(-1 * blocks[this.type].noize, blocks[this.type].noize) - this.lay * 30) + ")");
+		
 	}
-	draw() {
-		this.isSelected = 0;
-		this.xPos = this.xCell * blockSize - player.xPos + visionXRange * blockSize;
-		this.yPos = this.yCell * blockSize - player.yPos + visionYRange * blockSize;
-		ctx.fillStyle = this.colour;
+	draw(x, y) {
+		this.xPos = x * blockSize - player.xPos + visionXRange * blockSize;
+		this.yPos = y * blockSize - player.yPos + visionYRange * blockSize;
+		ctx.fillStyle = this.color;
 		ctx.fillRect(this.xPos, this.yPos, blockSize, blockSize);
 	}
 }
@@ -27,13 +25,9 @@ class Player {
 		this.yCollision = blockSize;
 	}
 	movement() {
-		
 		this.yForce = this.yForce + 0.1 * blockSize / 30; //gravity
-
 		
-		if ((this.xForce != 0 && keyPressed[1] == 0 && keyPressed[3] == 0) && (foreground[this.xCell][div(this.yPos + 1 + this.yCollision, blockSize)] != null)) {
-			this.xForce = 0;
-		}
+		
 		
 		//keyboard control
 		if ((keyPressed[0] == 1) && (foreground[this.xCell][div(this.yPos + 1 + this.yCollision, blockSize)] != null)) {
@@ -49,21 +43,15 @@ class Player {
 		
 			// _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ vvv  Collision  vvv _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \\
 		
-		if ((this.xForce != 0) && ((foreground[div(this.xPos + this.xForce + this.xCollision * digit(this.xForce), blockSize)][div(this.yPos + this.yCollision - 0.1, blockSize)] != null) || (foreground[div(this.xPos + this.xForce + this.xCollision * digit(this.xForce), blockSize)][div(this.yPos - this.yCollision, blockSize)] != null))) {
-			this.xForce = 0;
-		}
+		this.collisionPoints = [[this.xPos - this.xCollision, this.yPos + this.yCollision - 1], [this.xPos - this.xCollision, this.yPos], [this.xPos - this.xCollision, this.yPos - this.yCollision], [this.xPos + this.xCollision - 1, this.yPos + this.yCollision - 1], [this.xPos + this.xCollision - 1, this.yPos], [this.xPos + this.xCollision - 1, this.yPos - this.yCollision]];
 		
-		if (this.yForce != 0) {
-			for (var i = 0; i < Math.abs(Math.round(this.yForce * 10)); i++) {
-				if ((foreground[div(this.xPos + this.xCollision - 0.1, blockSize)][div(this.yPos + (i / 10 + this.yCollision) * digit(this.yForce), blockSize)] != null) || (foreground[div(this.xPos - this.xCollision + 0.1, blockSize)][div(this.yPos + (i / 10 + this.yCollision) * digit(this.yForce), blockSize)] != null)) {
-					this.yForce = (i - 1) / 10;
-				}
-			}
+		for (var i = 0; i < this.collisionPoints.length; i++) {
+			this.collision(this.collisionPoints[i][0], this.collisionPoints[i][1], this);
 		}
 		
 		//movement
-		this.xPos = this.xPos + Math.round(this.xForce);
-		this.yPos = this.yPos + Math.round(this.yForce);
+		this.xPos = this.xPos + Math.floor(this.xForce);
+		this.yPos = this.yPos + Math.floor(this.yForce);
 		
 	}
 	
@@ -106,24 +94,155 @@ class Player {
 	}
 	
 	blockSelector () {
-		var sin;
-		var cos;
-		
-		sin = (xMouse - screen.width / 2) / (pifagor(xMouse - screen.width / 2, yMouse - screen.height / 2));
-		cos = (yMouse - screen.height / 2) / (pifagor(xMouse - screen.width / 2, yMouse - screen.height / 2));
-		
-		for (var i = 0; i < useDist * blockSize; i++) {
-			if (div(player.xPos + i * sin, blockSize) >= 0 && div(player.yPos + i * cos, blockSize) >= 0 && foreground[div(player.xPos + i * sin, blockSize)][div(player.yPos + i * cos, blockSize)] != null) {
-				ctx.fillStyle = "red";
-				obj = foreground[div(player.xPos + i * sin, blockSize)][div(player.yPos + i * cos, blockSize)];
-				obj.isSelected = 1;
-				ctx.fillRect(obj.xPos, obj.yPos, blockSize, blockSize);
-				break
+		if (buildMode == 0) {
+			targ = 0;
+			obj = []; 
+			if (targ == 0) {
+				var x = 0;
+				for (var y = checkQuality; y < 1; y = y + checkQuality) {
+					if (targ == 0) {
+						blockBreakChecker(x, y);
+					}
+					else {
+						break;
+					}			
+				}	
 			}
+		
+			if (targ == 0) {
+				var x = 1;
+				for (var y = checkQuality; y < 1; y = y + checkQuality) {
+					if (targ == 0) {
+						blockBreakChecker(x, y);
+					}
+					else {
+						break;
+					}
+				}
+			}
+			
+			if (targ == 0) {
+				var y = 0;
+				for (var x = checkQuality; x < 1; x = x + checkQuality) {
+					if (targ == 0) {
+						blockBreakChecker(x, y);
+					}
+					else {
+						break;
+					}			
+				}
+			}
+		
+			if (targ == 0) {
+				var y = 1;
+				for (var x = checkQuality; x < 1; x = x + checkQuality) {
+					if (targ == 0) {
+						blockBreakChecker(x, y);
+					}	
+					else {
+						break;
+					}		
+				}
+			}
+		
+			if (targ == 1) {
+				ctx.drawImage(picTarget, foreground[obj[0]][obj[1]].xPos, foreground[obj[0]][obj[1]].yPos, blockSize, blockSize);	
+			}				
+		}
+	
+		if (buildMode == 1) {
+			targ = 0;
+			obj = []; 
+			if (targ == 0) {
+				var x = 0;
+				for (var y = checkQuality; y < 1; y = y + checkQuality) {
+					if (targ == 0) {
+						blockBuildChecker(x, y);
+					}
+					else {
+						break;
+					}			
+				}	
+			}
+		
+			if (targ == 0) {
+				var x = 1;
+				for (var y = checkQuality; y < 1; y = y + checkQuality) {
+					if (targ == 0) {
+						blockBuildChecker(x, y);
+					}
+					else {
+						break;
+					}
+				}
+			}
+			
+			if (targ == 0) {
+				var y = 0;
+				for (var x = checkQuality; x < 1; x = x + checkQuality) {
+					if (targ == 0) {
+						blockBuildChecker(x, y);
+					}
+					else {
+						break;
+					}			
+				}
+			}
+		
+			if (targ == 0) {
+				var y = 1;
+				for (var x = checkQuality; x < 1; x = x + checkQuality) {
+					if (targ == 0) {
+						blockBuildChecker(x, y);
+					}	
+					else {
+						break;
+					}		
+				}
+			}			
+		}
+	}	
+	
+	collision (x, y, obj) {	
+		if (foreground[div(x + obj.xForce + 1 * digit(obj.xForce), blockSize)][div(y, blockSize)] != null) {
+			obj.xForce = 0;
 		}
 		
+		if ((foreground[div(obj.xPos + obj.xCollision - 1, blockSize)][div(this.yPos + 1 + this.yCollision, blockSize)] != null || foreground[div(obj.xPos - obj.xCollision, blockSize)][div(this.yPos + 1 + this.yCollision, blockSize)] != null) && keyPressed[1] != 1 && keyPressed[3] != 1) {
+			obj.xForce = 0;
+		}
+		
+		for (var i = 0; i < Math.abs(obj.yForce); i++) {
+			if (foreground[div(x, blockSize)][div(y + (i + 1) * digit(obj.yForce), blockSize)] != null) {
+				obj.yForce = i * digit(obj.yForce);
+				break;
+			}			
+		}		
 	}
- }
+	
+	mouse() {
+		if (mousePressed == 1) {
+			object = obj;
+			this.blockSelector();
+			if (buildMode == 0 && obj.length > 0) {
+				if (object[0] == obj[0] && object[1] == obj[1]) {
+					s = s - toolPower;
+					if (s <= 0) {
+						foreground[obj[0]][obj[1]] = null;
+					}
+					else {
+						ctx.fillStyle = "black";
+						ctx.fillRect(foreground[obj[0]][obj[1]].xPos, foreground[obj[0]][obj[1]].yPos + blockSize, blockSize, s / blocks[foreground[obj[0]][obj[1]].type].s * blockSize - blockSize);
+						ctx.drawImage(picTarget, obj[0] * blockSize - player.xPos + visionXRange * blockSize, obj[1]  * blockSize - player.yPos + visionYRange * blockSize, blockSize, blockSize);
+					}
+				}
+				else {					
+					s = blocks[foreground[obj[0]][obj[1]].type].s;								
+				}
+			}
+		}		
+	}
+}
 
  
 class Tree {
@@ -153,23 +272,17 @@ class Tree {
 			for (var y = 0; y < this.crownSize + this.height; y++) {
 				switch (this.arr[x][y]) {
 					case 1:
-						middleground[x + this.xPos - this.crownSize][y + this.yPos - (this.height - 1)] = new Block(x + this.xPos - this.crownSize, y + this.yPos - (this.height - 1), WOOD);
+						background[x + this.xPos - this.crownSize][y + this.yPos - (this.height - 1)] = new Block(WOOD, 2);
 						break;
 					case 2:
-						middleground[x + this.xPos - this.crownSize][y + this.yPos  - (this.height - 1)] = new Block(x + this.xPos - this.crownSize, y + this.yPos - (this.height - 1), FOLIAGE);
-						foreground[x + this.xPos - this.crownSize][y + this.yPos  - (this.height - 1)] = new Block(x + this.xPos - this.crownSize, y + this.yPos - (this.height - 1), FOLIAGE);
+						background[x + this.xPos - this.crownSize][y + this.yPos  - (this.height - 1)] = new Block(FOLIAGE, 2);
+						foreground[x + this.xPos - this.crownSize][y + this.yPos  - (this.height - 1)] = new Block(FOLIAGE, 0);
 						break;
 				}
 			}
 		}
 	}
 }
-
-
-
-
-
-
 
 
 

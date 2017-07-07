@@ -44,7 +44,12 @@ function getMinElem(arr){
 }
 
 function digit(x){
-	return(x / Math.abs(x));
+	if (x >= 0) {
+		return (1);
+	}
+	else {
+		return (-1);
+	}
 }
 
 function boolToInt(x){

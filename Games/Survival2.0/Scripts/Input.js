@@ -5,16 +5,12 @@ function mouseMoved(x, y) {
 }
 
 function mouseDown() {
-	for (var x = leftBorder; x < rightBorder; x++) {
-		for (var y = upBorder; y < downBorder; y++) {
-			if (foreground[x][y] != null && foreground[x][y].isSelected == 1) {
-				foreground[x][y] = null;
-			}			
-			
-		}
-	}
+	mousePressed = 1;
 }
 
+function mouseUp () {
+	mousePressed = 0;
+}
 
 // Keyboard -------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +19,7 @@ window.addEventListener("keyup", this.checkUp, false);
 var key;
 
 function checkDown(e) {
-  key = e.keyCode;
+	key = e.keyCode;
 	switch(key){
 		case 87:
 			keyPressed[0] = 1;
@@ -37,14 +33,17 @@ function checkDown(e) {
 		case 68:
 			keyPressed[3] = 1;
 			break;
+		case 66:
+			player.yPos = player.yPos - 10;
+			break;
 		case 32:
-			generator();
+			buildMode = (buildMode - 1) * -1
 			break;
 	}
 }
 
 function checkUp(e) {
-  key = e.keyCode;
+    key = e.keyCode;
 	switch(key){
 		case 87:
 			keyPressed[0] = 0;

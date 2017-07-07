@@ -27,7 +27,7 @@ function tick() {
 	for (var x = leftBorder; x < rightBorder; x++) {
 		for (var y = upBorder; y < downBorder; y++) {
 			if (background[x][y] != null) {
-				background[x][y].draw();
+				background[x][y].draw(x, y);
 			}			
 			
 		}
@@ -35,7 +35,7 @@ function tick() {
 	for (var x = leftBorder; x < rightBorder; x++) {
 		for (var y = upBorder; y < downBorder; y++) {
 			if (middleground[x][y] != null) {
-				middleground[x][y].draw();
+				middleground[x][y].draw(x, y);
 			}			
 			
 		}
@@ -43,14 +43,14 @@ function tick() {
 	for (var x = leftBorder; x < rightBorder; x++) {
 		for (var y = upBorder; y < downBorder; y++) {
 			if (foreground[x][y] != null) {
-				foreground[x][y].draw();
+				foreground[x][y].draw(x, y);
 			}			
 			
 		}
 	}
 	
 	player.draw();
-	player.blockSelector();
+	player.mouse();
 }
 
 
